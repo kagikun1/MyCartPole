@@ -1,8 +1,10 @@
+#備忘録
+
 ssh接続手順
 
 鍵ペア作成
-cd ~/.ssh
-ssh-keygen -t rsa
+`cd ~/.ssh`
+`ssh-keygen -t rsa`
 
 鍵アップロード後確認
 https://github.com/settings/keys
