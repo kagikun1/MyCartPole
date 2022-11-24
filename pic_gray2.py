@@ -14,31 +14,13 @@ import os
 #         cv2.imwrite(output_path, img)
 
 def show_img1():
-    for i in range(0, 2):
+    for i in range(0, len(all_image) // 2):
         img = cv2.imread(str(all_image[i]), cv2.IMREAD_GRAYSCALE)
         output_path = output_dir + '/' + all_image[i].name
         cv2.imwrite(output_path, img)
 
 def show_img2():
-    for i in range(3, 4):
-        img = cv2.imread(str(all_image[i]), cv2.IMREAD_GRAYSCALE)
-        output_path = output_dir + '/' + all_image[i].name
-        cv2.imwrite(output_path, img)
-
-def show_img3():
-    for i in range(5, 6):
-        img = cv2.imread(str(all_image[i]), cv2.IMREAD_GRAYSCALE)
-        output_path = output_dir + '/' + all_image[i].name
-        cv2.imwrite(output_path, img)
-        
-def show_img4():
-    for i in range(7, 8):
-        img = cv2.imread(str(all_image[i]), cv2.IMREAD_GRAYSCALE)
-        output_path = output_dir + '/' + all_image[i].name
-        cv2.imwrite(output_path, img)
-
-def show_img5():
-    for i in range(9, 10):
+    for i in range(len(all_image) // 2 + 1, len(all_image), 1):
         img = cv2.imread(str(all_image[i]), cv2.IMREAD_GRAYSCALE)
         output_path = output_dir + '/' + all_image[i].name
         cv2.imwrite(output_path, img)
@@ -53,11 +35,10 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as ex:
         ex.submit(show_img1())
         ex.submit(show_img2())
-        ex.submit(show_img3())
-        ex.submit(show_img4())
-        ex.submit(show_img5())
     
     t2 = time.perf_counter()
     end = t2 - t1
 
     print(f'処理時間 ： {end}')
+
+    
