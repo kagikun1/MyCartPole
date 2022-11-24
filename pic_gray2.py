@@ -41,4 +41,4 @@ if __name__ == "__main__":
 
     print(f'処理時間 ： {end}')
 
-    
+    #aaaa
