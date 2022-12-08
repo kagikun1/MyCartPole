@@ -31,19 +31,18 @@ class Environment():
 
         for episode in range(MAX_EPISODES):
             # 環境初期化
-            observation, _ = self.env.reset()
-            self.env.render()
+            observation, _= self.env.reset()
             for step in range(MAX_STEPS):
                 # 最終エピソードを画像として保存
                 if is_episode_final:
-                    frames.append(self.env.render(mode='rgb_array'))
+                    frames.append(self.env.render())
                 
                 # 行動の選択
                 action = self.agent.get_action(observation, episode)
                 # 
-                observation_next, _, done, _, _ = self.env.step(action)
+                observation_next, _, terminated, truncated, _ = self.env.step(action)
                 #zzz = self.env.step(action)
-                #done = True
+                done = terminated or truncated
 
                 if done:
                     if step < 195:
@@ -59,6 +58,8 @@ class Environment():
                 self.agent.update_Q_function(observation, action, reward, observation_next)
                 # 次の観測へ
                 observation = observation_next
+                
+                print(observation, complete_episode, terminated, truncated)
 
                 if done:
                     step_list.append(step+1)
@@ -82,6 +83,12 @@ class Environment():
             if complete_episode >= 100:
                 print('100回連続成功')
                 is_episode_final = True
-        
-                    
 
+TOY = "CartPole-v1"
+
+def main():
+    cartpole = Environment(TOY)
+    cartpole.run()
+
+if __name__ == '__main__':
+    main()
