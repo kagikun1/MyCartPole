@@ -110,14 +110,14 @@ def main():
         else:
             complete_episode = 0
 
-        if complete_episode >= 300:
+        if complete_episode >= 100:
             print('100回連続成功')
             is_final_episode = True
 
         print(f'Episode:{episode:4.0f}, R:{episode_reward:4.0f}')
     
     # 最終的なQTableをファイルに出力
-    np.savetxt('Qvalue.txt', q_table)
+    np.savetxt(save_path + '\\Qvalue.txt', q_table)
 
 if __name__ == '__main__':
     main()
