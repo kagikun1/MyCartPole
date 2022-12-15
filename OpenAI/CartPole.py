@@ -8,7 +8,8 @@ from matplotlib import animation
 class MyQTable():
     def __init__(self, num_action):         # QTableをファイルから取得
         Qvalue_path = 'OpenAI\\Qvalue.txt'
-        #self._Qtable = np.random.uniform(low=-1, high=1, size=(num_digitized**4, num_action))
+        
+        # self._Qtable = np.random.uniform(low=-1, high=1, size=(num_digitized**4, num_action))
         self._Qtable = np.loadtxt(Qvalue_path)
 
     def get_action(self, next_state, epsilon):
