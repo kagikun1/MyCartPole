@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 
 class MyQTable():
-    def __init__(self, num_action):
+    def __init__(self, num_action):         # QTableをファイルから取得
+        Qvalue_path = 'OpenAI\\Qvalue.txt'
         #self._Qtable = np.random.uniform(low=-1, high=1, size=(num_digitized**4, num_action))
-        self._Qtable = np.loadtxt('Qvalue.txt')
+        self._Qtable = np.loadtxt(Qvalue_path)
 
     def get_action(self, next_state, epsilon):
         if epsilon > np.random.uniform(0, 1):
@@ -19,14 +20,15 @@ class MyQTable():
         return next_action
 
     def update_Qtable(self, state, action, reward, next_state):
-        gamma = 0.9
-        alpha = 0.5
+        alpha = 0.2
+        gamma = 0.99
         next_maxQ = max(self._Qtable[next_state])
         self._Qtable[state, action] = (1 - alpha) * self._Qtable[state, action] + alpha * (reward + gamma * next_maxQ)
 
         return self._Qtable
 
 num_digitized = 6
+
 def digitized_state(observation):
     p, v, a, w = observation
     d = num_digitized
@@ -39,11 +41,12 @@ def digitized_state(observation):
 
 def main():
     step_list = []
-    frames = []
-    num_episodes = 1000
-    max_number_of_steps = 200
-    complete_episode = 0
-    is_final_episode = False
+    frames = []                     # 画像保存用変数
+    num_episodes = 1000             # 最大エピソード数
+    max_number_of_steps = 200       # 1エピソード当たりのステップ数
+    complete_episode = 0            # 完了エピソード数
+    is_final_episode = False        # 最終判定フラグ
+    save_path = 'OpenAI'            # 動画像保存先ディレクトリ
     
     env = gym.make('CartPole-v1', render_mode = 'rgb_array')
     tab = MyQTable(env.action_space.n)
@@ -51,14 +54,16 @@ def main():
         observation, _= env.reset()
         state = digitized_state(observation)
         episode_reward = 0
+            
         for t in range(max_number_of_steps):
+
+            if is_final_episode:
+                frames.append(env.render())
+
             epsilon = 0.5*(1/(episode + 1))
             action = tab.get_action(state, epsilon)
             observation, reward, terminated, truncated, _ = env.step(action)
             done = truncated or terminated
-
-            if is_final_episode:
-                frames.append(env.render())
             
             if done:
                 if t < max_number_of_steps - 1:
@@ -66,8 +71,9 @@ def main():
                     complete_episode = 0
                 else:
                     reward += 1
-                    complete_episode += 1
+                    # complete_episode += 1
                     print(f'CE{complete_episode}')
+                    break
 
             next_state = digitized_state(observation)
             q_table = tab.update_Qtable(state, action, reward, next_state)
@@ -77,12 +83,15 @@ def main():
             if done:
                 step_list.append(t + 1)
                 break
-
+        
+        # 結果をpngとmp4で出力
         if is_final_episode:
-            frames.append(env.render())
+            print(f'結果を書き出します　[保存先] {save_path}')
             es = np.arange(0, len(step_list))
             plt.plot(es, step_list)
-            plt.savefig("cartpole.png")
+            plt.savefig(save_path + "\\CartPoleReward.png")
+            print(f'png書き出し完了')
+            
             plt.figure()
             patch = plt.imshow(frames[0])
             plt.axis('off')
@@ -91,18 +100,24 @@ def main():
                 patch.set_data(frames[i])
 
             anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=50)
-            anim.save('cartpole1.mp4', "ffmpeg")
+            anim.save(save_path + '\\CartPoleMovie.mp4', "ffmpeg")
+            print(f'mp4書き出し完了')
             break
+        
+        # 100エピソード連続完了で最終試行へ
+        if episode_reward == 200:
+            complete_episode += 1
+        else:
+            complete_episode = 0
 
-        if complete_episode >= 100:
+        if complete_episode >= 300:
             print('100回連続成功')
             is_final_episode = True
 
         print(f'Episode:{episode:4.0f}, R:{episode_reward:4.0f}')
-
+    
+    # 最終的なQTableをファイルに出力
     np.savetxt('Qvalue.txt', q_table)
-    print(is_final_episode)
-
 
 if __name__ == '__main__':
     main()
